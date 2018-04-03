@@ -14,6 +14,8 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -124,52 +126,83 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected Weather doInBackground(String... params)
         {
-            String data = ( (new WeatherHttpClient()).getWeatherData(params[0]));
-            weather = JSONWeatherParser.getWeather(data);
+            try {
+                URL url = new URL(Utils.BASE_URL + params[0]);
 
-            new DownloadImageAsyncTask().execute(weather.currentCondition.getIcon());
-            return weather;
+                HttpURLConnection connection = (HttpURLConnection) url
+                        .openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+
+                final int httpCodeResponse = connection.getResponseCode();
+
+                if (httpCodeResponse != HttpURLConnection.HTTP_OK)
+                {
+                    Log.d("Data : ", String.valueOf(httpCodeResponse));
+                    return null;
+                }
+                else
+                {
+                    String data = ( (new WeatherHttpClient()).getWeatherData(params[0]));
+                    weather = JSONWeatherParser.getWeather(data);
+
+                    new DownloadImageAsyncTask().execute(weather.currentCondition.getIcon());
+                    return weather;                }
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                return null;
+            }
         }
 
 
         @Override
         protected void onPostExecute(Weather weather)
         {
-            Calendar cal = Calendar.getInstance();
-            TimeZone tz = cal.getTimeZone();
+            if (weather != null)
+            {
+                Calendar cal = Calendar.getInstance();
+                TimeZone tz = cal.getTimeZone();
 
-            // is it local time ?
-            Log.d("Time zone: ", tz.getDisplayName());
+                // is it local time ?
+                Log.d("Time zone: ", tz.getDisplayName());
 
-            // date formatter in local timezone
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-            sdf.setTimeZone(tz);
+                // date formatter in local timezone
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                sdf.setTimeZone(tz);
 
-            String updateDate = sdf.format(new Date(weather.place.getLastupdate() * 1000));
-            String sunriseDate = sdf.format(new Date(weather.place.getSunrise() * 1000));
-            String sunsetDate = sdf.format(new Date(weather.place.getSunset() * 1000));
-            Log.d("Time: ", updateDate);
+                String updateDate = sdf.format(new Date(weather.place.getLastupdate() * 1000));
+                String sunriseDate = sdf.format(new Date(weather.place.getSunrise() * 1000));
+                String sunsetDate = sdf.format(new Date(weather.place.getSunset() * 1000));
+                Log.d("Time: ", updateDate);
 
-            super.onPostExecute(weather);
+                super.onPostExecute(weather);
 
-            // Converting m/s to km/h
-            Double windKmh = weather.wind.getSpeed() * 3.6;
+                // Converting m/s to km/h
+                Double windKmh = weather.wind.getSpeed() * 3.6;
 
-            //getting nice & formated values
-            DecimalFormat decimalFormat = new DecimalFormat("#.#");
-            String tempFormat = decimalFormat.format(weather.currentCondition.getTemperature());
-            String windFormat = decimalFormat.format(windKmh);
+                //getting nice & formated values
+                DecimalFormat decimalFormat = new DecimalFormat("#.#");
+                String tempFormat = decimalFormat.format(weather.currentCondition.getTemperature());
+                String windFormat = decimalFormat.format(windKmh);
 
-            cityName.setText(weather.place.getCity() + "," + weather.place.getCountry());
-            temp.setText("" + tempFormat + " °C");
-            humidity.setText("Humidity: " + weather.currentCondition.getHumidity() + " %");
-            pressure.setText("Pressure: " + weather.currentCondition.getPressure() + " hPa");
-            wind.setText("Wind: " + windFormat.toString() + " km/h");
-            sunrise.setText("Sunrise: " + sunriseDate);
-            sunset.setText("Sunset: " + sunsetDate);
-            updated.setText("Last Updated: " + updateDate);
-            description.setText("Condition: " + weather.currentCondition.getCondition() + " (" +
-                    weather.currentCondition.getDescription() + ")");
+                cityName.setText(weather.place.getCity() + "," + weather.place.getCountry());
+                temp.setText("" + tempFormat + " °C");
+                humidity.setText("Humidity: " + weather.currentCondition.getHumidity() + " %");
+                pressure.setText("Pressure: " + weather.currentCondition.getPressure() + " hPa");
+                wind.setText("Wind: " + windFormat.toString() + " km/h");
+                sunrise.setText("Sunrise: " + sunriseDate);
+                sunset.setText("Sunset: " + sunsetDate);
+                updated.setText("Last Updated: " + updateDate);
+                description.setText("Condition: " + weather.currentCondition.getCondition() + " (" +
+                        weather.currentCondition.getDescription() + ")");
+
+            }
+            else
+            {
+                Toast.makeText(MainActivity.this, "Ain't city bitch !", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
