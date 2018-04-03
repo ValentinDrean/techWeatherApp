@@ -4,7 +4,8 @@ public class Snow
 {
     private int precipitation;
 
-    public int getPrecipitation() {
+    public int getPrecipitation()
+    {
         return precipitation;
     }
 

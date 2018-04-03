@@ -20,7 +20,6 @@ public class CurrentCondition
         this.description = description;
     }
 
-
     public int getWeatherId() {
         return weatherId;
     }

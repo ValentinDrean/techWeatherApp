@@ -13,7 +13,6 @@ public class CityPreference
     }
 
     // if no chosen city here's default :
-
     public String getCity()
     {
         return prefs.getString("city", "Montreuil, FR");

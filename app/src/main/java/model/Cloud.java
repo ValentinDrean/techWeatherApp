@@ -1,6 +1,6 @@
 package model;
 
-public class Clouds
+public class Cloud
 {
     private int precipitation;
 

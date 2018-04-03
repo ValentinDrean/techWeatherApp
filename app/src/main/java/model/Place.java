@@ -10,7 +10,6 @@ public class Place
     private String city;
     private long lastupdate;
 
-
     public float getLon() {
         return lon;
     }

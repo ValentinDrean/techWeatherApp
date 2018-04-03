@@ -2,17 +2,8 @@ package model;
 
 public class Temperature
 {
-    private double temp;
     private float minTemp;
     private float maxTemp;
-
-    public double getTemp() {
-        return temp;
-    }
-
-    public void setTemp(double temp) {
-        this.temp = temp;
-    }
 
     public float getMinTemp() {
         return minTemp;

@@ -14,19 +14,15 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
-
 import data.CityPreference;
 import data.JSONWeatherParser;
 import data.WeatherHttpClient;
@@ -72,7 +68,6 @@ public class MainActivity extends AppCompatActivity
 
     public void renderWeatherData(String city)
     {
-        //
         WeatherTask weatherTask = new WeatherTask();
         weatherTask.execute(new String[]{city + "&APPID=" + Utils.API_ID + "&units=metric"});
     }
@@ -89,7 +84,6 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(Bitmap bitmap)
         {
             iconView.setImageBitmap(bitmap);
-            // super.onPostExecute(bitmap);
         }
 
         private Bitmap downloadImage(String code)
@@ -121,7 +115,8 @@ public class MainActivity extends AppCompatActivity
                 e.printStackTrace();
                 return null;
             }
-        }    }
+        }
+    }
 
     private class WeatherTask extends AsyncTask<String, Void, Weather>
     {
@@ -131,7 +126,6 @@ public class MainActivity extends AppCompatActivity
         {
             String data = ( (new WeatherHttpClient()).getWeatherData(params[0]));
             weather = JSONWeatherParser.getWeather(data);
-//            return null;
 
             new DownloadImageAsyncTask().execute(weather.currentCondition.getIcon());
             return weather;
@@ -144,7 +138,7 @@ public class MainActivity extends AppCompatActivity
             Calendar cal = Calendar.getInstance();
             TimeZone tz = cal.getTimeZone();
 
-            // is it local time?
+            // is it local time ?
             Log.d("Time zone: ", tz.getDisplayName());
 
             // date formatter in local timezone
@@ -158,8 +152,10 @@ public class MainActivity extends AppCompatActivity
 
             super.onPostExecute(weather);
 
+            // Converting m/s to km/h
             Double windKmh = weather.wind.getSpeed() * 3.6;
 
+            //getting nice & formated values
             DecimalFormat decimalFormat = new DecimalFormat("#.#");
             String tempFormat = decimalFormat.format(weather.currentCondition.getTemperature());
             String windFormat = decimalFormat.format(windKmh);
@@ -175,17 +171,16 @@ public class MainActivity extends AppCompatActivity
             description.setText("Condition: " + weather.currentCondition.getCondition() + " (" +
                     weather.currentCondition.getDescription() + ")");
         }
-
     }
 
-    private void showInputDialog()
+    private void showInputDialogChangeCity()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Change City");
 
         final EditText cityInput = new EditText(MainActivity.this);
         cityInput.setInputType(InputType.TYPE_CLASS_TEXT);
-        cityInput.setHint("Parsi, FR");
+        cityInput.setHint("Paris, FR");
         builder.setView(cityInput);
         builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
             @Override
@@ -203,7 +198,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action if it is present
+        // Inflate the menu; this adds items to the action if it's present
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -215,7 +210,7 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.change_cityId)
         {
-            showInputDialog();
+            showInputDialogChangeCity();
         }
         return super.onOptionsItemSelected(item);
     }
